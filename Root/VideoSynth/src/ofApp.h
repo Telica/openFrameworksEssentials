@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxGui.h"
 
 class ofApp : public ofBaseApp{
 
@@ -22,5 +23,21 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
-		
+		void exit();
+		//GUI Settings
+		ofxPanel gui;
+		ofxIntSlider countX;
+		ofxFloatSlider stepX;
+		ofxFloatSlider twistX;
+		//GUI Group
+		ofxGuiGroup globalGroup;
+		ofxFloatSlider Scale;
+		ofxFloatSlider Rotate;
+		ofxFloatSlider Background;
+		//Primitive Group.
+		ofxGuiGroup primGroup;
+		ofxFloatSlider shiftY, rotate;
+		ofxVec2Slider size;
+		ofxColorSlider color;
+		ofxToggle filled, type;
 };
