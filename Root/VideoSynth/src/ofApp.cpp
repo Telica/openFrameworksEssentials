@@ -1,5 +1,7 @@
 #include "ofApp.h"
 
+bool showGui;
+
 //--------------------------------------------------------------
 void ofApp::setup(){
 	//Settings.
@@ -15,11 +17,18 @@ void ofApp::setup(){
 	gui.add(stepX.setup("stepX", 20, 0, 200));
 	gui.add(twistX.setup("twistX", 5, -45, 45));
 
+	//Matrix Pattern GUI.
+	gui.add(countY.setup("countY", 0, 0, 50));
+	gui.add(stepY.setup("stepY", 20, 0, 200));
+	gui.add(twistY.setup("twistY", 0, -30, 30));
+	gui.add(pinchY.setup("pinchY", 0, 0, 1));
+
+
 	//Global group settings.
 	globalGroup.setup("Global");
 	globalGroup.add(Scale.setup("Scale", 1, 0.0, 1));
 	globalGroup.add(Rotate.setup("Rotate", 0, -180, 180));
-	globalGroup.add(Background.setup("Scale", 255, 0, 255));
+	globalGroup.add(Background.setup("Background", 255, 0, 255));
 
 	//Add the group to the gui panel.
 	gui.add(&globalGroup);
@@ -35,6 +44,8 @@ void ofApp::setup(){
 	primGroup.add(type.setup("type", false));
 
 	gui.add(&primGroup);
+
+	showGui = true;
 	//Load last GUI State.
 	gui.loadFromFile("settings.xml");
 }
@@ -53,11 +64,11 @@ void ofApp::draw(){
 	//push coordinate system on a stack
 	ofPushMatrix();
 	ofTranslate(ofGetWidth() / 2, ofGetHeight() / 2);
-	stripePattern();
+	matrixPattern();
 	//return from the stack
 	ofPopMatrix();
 
-	gui.draw();
+	if (showGui) gui.draw();
 }
 
 void ofApp::stripePattern()
@@ -92,8 +103,38 @@ void ofApp::stripePattern()
 	}
 }
 
+void ofApp::matrixPattern() {
+	for (int y = -countY; y <= countY; y++) {
+		ofPushMatrix();
+		//--------------
+		if (countY > 0) {
+			float scl = ofMap(y, -countY, countY, 1 - pinchY, 1);
+			ofScale(scl, scl);
+		}
+		ofTranslate(0, y * stepY);
+		ofRotate(y * twistY);
+		stripePattern();
+		//--------------
+		ofPopMatrix();
+	}
+}
+
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+	if (key == 'z') showGui = !showGui;
+	if (key == OF_KEY_RETURN) ofSaveScreen("screenshot" + ofToString(ofRandom(0,1000),0) + ".png");
+
+	if (key == 's') {
+		ofFileDialogResult res;
+		res = ofSystemSaveDialog("preset.xml", "Saving Preset");
+		if (res.bSuccess) gui.saveToFile(res.filePath);
+	}
+
+	if (key ==  'l') {
+		ofFileDialogResult res;
+		res = ofSystemLoadDialog("Loading Preset");
+		if (res.bSuccess) gui.loadFromFile(res.filePath);
+	}
 
 }
 

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<Parameters>
+	<countX>200</countX>
+	<stepX>67</stepX>
+	<twistX>-5.4</twistX>
+	<countY>50</countY>
+	<stepY>0</stepY>
+	<twistY>-15.3</twistY>
+	<pinchY>0</pinchY>
+	<Global>
+		<Scale>0</Scale>
+		<Rotate>-56.9388</Rotate>
+	</Global>
+	<Primitive>
+		<shiftY>-602.041</shiftY>
+		<rotate>-25.7143</rotate>
+		<size>1.25781, 1.98667</size>
+		<color>205, 122, 186, 255</color>
+		<filled>1</filled>
+		<type>0</type>
+	</Primitive>
+</Parameters>

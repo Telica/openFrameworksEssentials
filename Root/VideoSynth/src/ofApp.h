@@ -40,4 +40,9 @@ class ofApp : public ofBaseApp{
 		ofxVec2Slider size;
 		ofxColorSlider color;
 		ofxToggle filled, type;
+
+		//Matrix Pattern Generation Variables.
+		ofxIntSlider countY;
+		ofxFloatSlider stepY, twistY, pinchY;
+		void matrixPattern();
 };
