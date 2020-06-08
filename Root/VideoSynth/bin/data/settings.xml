@@ -1,18 +1,33 @@
 <?xml version="1.0"?>
 <Parameters>
-	<countX>83</countX>
-	<stepX>0</stepX>
-	<twistX>-29.25</twistX>
+	<countX>30</countX>
+	<stepX>20</stepX>
+	<twistX>-19.35</twistX>
 	<Global>
-		<Scale>0</Scale>
-		<Rotate>-53.2653</Rotate>
+		<Scale>0.397959</Scale>
+		<Rotate>-97.3469</Rotate>
+		<Background>94.9745</Background>
 	</Global>
 	<Primitive>
 		<shiftY>-173.469</shiftY>
 		<rotate>-62.449</rotate>
-		<size>0.3207, 15.9392</size>
-		<color>9, 205, 105, 255</color>
+		<size>7.81758, 7.29696</size>
+		<color>178, 201, 0, 120</color>
 		<filled>1</filled>
 		<type>1</type>
 	</Primitive>
+	<countY>13</countY>
+	<stepY>36</stepY>
+	<twistY>-12.3</twistY>
+	<pinchY>0.6</pinchY>
+	<Mixer>
+		<image>118.393</image>
+		<video>57.2449</video>
+		<camera>0</camera>
+		<kenabled>1</kenabled>
+		<ksectors>100</ksectors>
+		<kangle>-11.0204</kangle>
+		<kx>0.44898</kx>
+		<ky>0.163265</ky>
+	</Mixer>
 </Parameters>

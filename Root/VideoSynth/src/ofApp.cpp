@@ -10,6 +10,14 @@ void ofApp::setup(){
 	ofSetFrameRate(60);
 	ofBackground(ofColor::white);
 
+	//Load image.
+	ofLoadImage(image, "eJ40ZCR.jpg");
+
+	//Load Video.
+	video.loadMovie("flowing.mp4");
+	video.play();
+
+
 	//gui title=Parameters and store in a file wit name settings.xml.
 	gui.setup("Parameters", "settings.xml");
 	// (starting value, min value, max value).
@@ -45,6 +53,30 @@ void ofApp::setup(){
 
 	gui.add(&primGroup);
 
+	//Mixer Group 
+	mixerGroup.setup("Mixer");
+	mixerGroup.setHeaderBackgroundColor(ofColor::darkRed);
+	mixerGroup.setBorderColor(ofColor::darkRed);
+
+	mixerGroup.add(imageAlpha.setup("image", 100, 0, 255));
+	mixerGroup.add(videoAlpha.setup("video", 200, 0, 255));
+	mixerGroup.add(cameraAlpha.setup("camera", 100, 0, 255));
+
+	//Shader Setup
+	shader.load( "kaleido" );
+	mixerGroup.add(kenabled.setup("kenabled", true));
+	mixerGroup.add(ksectors.setup("ksectors", 10, 1, 100));
+	mixerGroup.add(kangle.setup("kangle", 0, -180, 180));
+	mixerGroup.add(kx.setup("kx", 0.5, 0, 1));
+	mixerGroup.add(ky.setup("ky", 0.5, 0, 1));
+
+	gui.minimizeAll();
+	gui.add(&mixerGroup);
+
+	//Allocate buffer.
+	fbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
+
+	//----------------------------------------------------------
 	showGui = true;
 	//Load last GUI State.
 	gui.loadFromFile("settings.xml");
@@ -52,14 +84,63 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-
+	video.update();
+	if (camera.isInitialized()) camera.update();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
 
+	//Redirection Drawing to the virtual screen.
+	fbo.begin();
+	draw2d();
+	fbo.end();
+
+	ofSetColor(255);
+
+	//shader will be executed for each pixel of the screen.
+	if (kenabled) {
+		shader.begin();
+		shader.setUniform1i("ksectors", ksectors);
+		shader.setUniform1f("kangleRad", ofDegToRad(kangle));
+		shader.setUniform2f("kcenter", kx * ofGetWidth(), ky*ofGetHeight());
+		shader.setUniform2f("screenCenter", 0.5 * ofGetWidth(),
+			0.5 * ofGetHeight());
+	}
+
+
+	fbo.draw(0, 0, ofGetWidth(), ofGetHeight());
+
+	if (kenabled) shader.end();
+	//draw gui in the real screen always.
+	if (showGui) gui.draw();
+}
+
+void ofApp::draw2d() {
 	//Takes the color from the slider.
 	ofBackground(Background);
+
+	//----------------------------
+	//Enable additive blending.
+	ofDisableSmoothing();
+	ofEnableBlendMode(OF_BLENDMODE_ADD);
+	//Draw Image.
+	ofSetColor(255, imageAlpha);
+	image.draw(0, 0, ofGetWidth(), ofGetHeight());
+
+	//Draw Video.
+	ofSetColor(255, videoAlpha);
+	video.draw(0, 0, ofGetWidth(), ofGetHeight());
+
+	//Draw caputered live camera.
+	if (camera.isInitialized()) {
+		ofSetColor(255, cameraAlpha);
+		camera.draw(0, 0, ofGetWidth(), ofGetHeight());
+	}
+	//Enable alpha blending for the rest of the draw process.
+	ofEnableAlphaBlending();
+	ofEnableSmoothing();
+	//-----------------------------
 
 	//push coordinate system on a stack
 	ofPushMatrix();
@@ -67,8 +148,6 @@ void ofApp::draw(){
 	matrixPattern();
 	//return from the stack
 	ofPopMatrix();
-
-	if (showGui) gui.draw();
 }
 
 void ofApp::stripePattern()
@@ -134,6 +213,12 @@ void ofApp::keyPressed(int key){
 		ofFileDialogResult res;
 		res = ofSystemLoadDialog("Loading Preset");
 		if (res.bSuccess) gui.loadFromFile(res.filePath);
+	}
+
+	if (key == 'c') {
+		camera.setDeviceID(0);
+		camera.setDesiredFrameRate(30);
+		camera.initGrabber(1280, 720);
 	}
 
 }

@@ -24,6 +24,10 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		void exit();
+
+		//draw methods.
+		void draw2d();	
+
 		//GUI Settings
 		ofxPanel gui;
 		ofxIntSlider countX;
@@ -45,4 +49,27 @@ class ofApp : public ofBaseApp{
 		ofxIntSlider countY;
 		ofxFloatSlider stepY, twistY, pinchY;
 		void matrixPattern();
+
+		//Images.
+		ofTexture image;
+
+		//Video.
+		ofVideoPlayer video;
+
+		//Live Video Grabber.
+		ofVideoGrabber camera;
+
+		//Video Mixer Group.
+		ofxGuiGroup mixerGroup;
+		ofxFloatSlider imageAlpha, videoAlpha, cameraAlpha;
+
+		//Offscreen buffer.
+		ofFbo fbo;
+
+		//Shader
+		ofShader shader;
+		ofxToggle kenabled;
+		ofxIntSlider ksectors;
+		ofxFloatSlider kangle, kx, ky;
+
 };
