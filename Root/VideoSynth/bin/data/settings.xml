@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <Parameters>
-	<countX>30</countX>
-	<stepX>20</stepX>
-	<twistX>-19.35</twistX>
+	<countX>52</countX>
+	<stepX>11</stepX>
+	<twistX>-33.3</twistX>
 	<Global>
-		<Scale>0.397959</Scale>
+		<Scale>0.0204082</Scale>
 		<Rotate>-97.3469</Rotate>
-		<Background>94.9745</Background>
+		<Background>0</Background>
 	</Global>
 	<Primitive>
 		<shiftY>-173.469</shiftY>
@@ -16,18 +16,24 @@
 		<filled>1</filled>
 		<type>1</type>
 	</Primitive>
-	<countY>13</countY>
-	<stepY>36</stepY>
-	<twistY>-12.3</twistY>
-	<pinchY>0.6</pinchY>
+	<countY>16</countY>
+	<stepY>0</stepY>
+	<twistY>-9</twistY>
+	<pinchY>0.805</pinchY>
 	<Mixer>
-		<image>118.393</image>
-		<video>57.2449</video>
+		<image>104.082</image>
+		<video>188.648</video>
 		<camera>0</camera>
 		<kenabled>1</kenabled>
-		<ksectors>100</ksectors>
-		<kangle>-11.0204</kangle>
-		<kx>0.44898</kx>
-		<ky>0.163265</ky>
+		<ksectors>77</ksectors>
+		<kangle>-67.9592</kangle>
+		<kx>0.632653</kx>
+		<ky>0.530612</ky>
+		<show2d>255</show2d>
+		<show3d>255</show3d>
+		<rad>81.6327</rad>
+		<deform>0</deform>
+		<deformFreq>0</deformFreq>
+		<extrude>1</extrude>
 	</Mixer>
 </Parameters>

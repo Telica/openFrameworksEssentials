@@ -63,13 +63,33 @@ class ofApp : public ofBaseApp{
 		ofxGuiGroup mixerGroup;
 		ofxFloatSlider imageAlpha, videoAlpha, cameraAlpha;
 
-		//Offscreen buffer.
+		//Offscreen buffers.
 		ofFbo fbo;
-
+		ofFbo fbo2;
 		//Shader
 		ofShader shader;
 		ofxToggle kenabled;
 		ofxIntSlider ksectors;
 		ofxFloatSlider kangle, kx, ky;
 
+		//3D Graphics.
+		ofSpherePrimitive sphere;
+		ofEasyCam cam;
+		ofxToggle showWireFrame;
+		ofxGuiGroup draw3DGroup;
+
+		//Light and material;
+		ofLight light;
+		ofMaterial material;
+
+		void draw3d();
+
+		//Deforming sphere parameters.
+		ofxFloatSlider rad, deform, deformFreq, extrude;
+
+		//Parameters for mix 2d and 3d.
+		ofxFloatSlider show2d, show3d;
+		ofFbo fbo3d;
+
+		vector<glm::vec3> vertices0;
 };

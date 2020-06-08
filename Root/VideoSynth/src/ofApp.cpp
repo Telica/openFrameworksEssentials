@@ -70,10 +70,40 @@ void ofApp::setup(){
 	mixerGroup.add(kx.setup("kx", 0.5, 0, 1));
 	mixerGroup.add(ky.setup("ky", 0.5, 0, 1));
 
+	//Mixing 2D/3D.
+	mixerGroup.add(show2d.setup("show2d", 255, 0, 255));
+	mixerGroup.add(show3d.setup("show3d", 255, 0, 255));
+	fbo3d.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+
+	//DEFORM 3D Sphere.
+	mixerGroup.add(rad.setup("rad", 250, 0, 500));
+	mixerGroup.add(deform.setup("deform", 0.3, 0, 1.5));
+	mixerGroup.add(deformFreq.setup("deformFreq", 3, 0, 10));
+	mixerGroup.add(extrude.setup("extrude", 1, 0, 1));
+
 	gui.minimizeAll();
 	gui.add(&mixerGroup);
+	
+	//3D GRAPHICS.
+	draw3DGroup.setup("3dgraphics");
+	draw3DGroup.add(showWireFrame.setup("showWire", false));
+	gui.add(&draw3DGroup);
 
-	//Allocate buffer.
+	sphere.set(250, 80);
+	vertices0 = sphere.getMesh().getVertices();
+
+	//allocate offscreen texture for texturing 3d sphere.
+	fbo2.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
+
+	float w = fbo2.getWidth();
+	float h = fbo2.getHeight();
+
+	//rectangle of coordinates of all square area but flipped in y axis (u1,v1) = (0,h) (u2,v2) = (w,0)
+	sphere.mapTexCoords(0, h, w, 0);
+	//better orientation for the textured sphere (not related to the texturing process).
+	sphere.rotate(180, 0, 1, 0);
+
+	//Allocate buffer for kaleidscope shader.
 	fbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
 
 	//----------------------------------------------------------
@@ -86,6 +116,37 @@ void ofApp::setup(){
 void ofApp::update(){
 	video.update();
 	if (camera.isInitialized()) camera.update();
+	vector<glm::vec3> &vertices = sphere.getMesh().getVertices();
+
+	for (int i = 0; i < vertices.size(); i++) {
+		auto v = glm::normalize(vertices0[i]);
+
+		//the idea here is make the deformation periodically.
+		float sx = sin(v.x * deformFreq);
+		float sy = sin(v.y * deformFreq);
+		float sz = sin(v.z * deformFreq);
+
+		// apply deformation to the vertex based in a deform strenght and previously deform shifts.
+		v.x += sy * sz * deform;
+		v.y += sx * sz * deform;
+		v.z += sx * sy * deform;
+
+		//
+		v = v * float(rad);
+		vertices[i] = v;
+	}
+
+	ofPixels pixels;
+	fbo2.readToPixels(pixels);
+
+	for (int i = 0; i < vertices.size(); i++) {
+		ofVec2f t = sphere.getMesh().getTexCoords()[i];
+		//clamp to the pixels array dimensions.
+		t.x = ofClamp(t.x, 0, pixels.getWidth() - 1);
+		t.y = ofClamp(t.y, 0, pixels.getHeight() - 1);
+		float br = pixels.getColor(t.x, t.y).getBrightness();
+		vertices[i] *= 1 + br / 255.0  * extrude;
+	}
 }
 
 //--------------------------------------------------------------
@@ -97,8 +158,8 @@ void ofApp::draw(){
 	fbo.end();
 
 	ofSetColor(255);
-
 	//shader will be executed for each pixel of the screen.
+	fbo2.begin();
 	if (kenabled) {
 		shader.begin();
 		shader.setUniform1i("ksectors", ksectors);
@@ -107,11 +168,23 @@ void ofApp::draw(){
 		shader.setUniform2f("screenCenter", 0.5 * ofGetWidth(),
 			0.5 * ofGetHeight());
 	}
-
-
 	fbo.draw(0, 0, ofGetWidth(), ofGetHeight());
-
 	if (kenabled) shader.end();
+	fbo2.end();
+
+	//----------------------------------
+	//draw 3d objects.
+	fbo3d.begin();
+	ofBackground(0, 0);
+	draw3d();
+	fbo3d.end();
+
+	ofBackground(0);
+	ofSetColor(255, show2d);
+	fbo2.draw(0,0);
+	ofSetColor(255, show3d);
+	fbo3d.draw(0,0);
+
 	//draw gui in the real screen always.
 	if (showGui) gui.draw();
 }
@@ -148,6 +221,41 @@ void ofApp::draw2d() {
 	matrixPattern();
 	//return from the stack
 	ofPopMatrix();
+}
+
+void ofApp::draw3d() {
+
+	//Get texture of fb2.
+	fbo2.getTextureReference().bind();
+
+	//enable single point light, material and z-buffer.
+	light.setPosition(ofGetWidth() / 2, ofGetHeight() / 2, 600);
+	light.enable();
+	material.begin();
+	ofEnableDepthTest();
+
+	//orbit camera.
+	/*
+	float time = ofGetElapsedTimef();
+	float longitude = 10 * time;
+	float latitude = 10 * sin(time * 0.8);
+	float radius = 600 + 50 * (sin(time * 0.4));
+	cam.orbit(longitude, latitude, radius);
+	*/
+
+	cam.begin();
+	ofSetColor(ofColor::white);
+	showWireFrame? sphere.drawWireframe(): sphere.draw();
+	cam.end();
+
+	//desactivate texture.
+	fbo2.getTextureReference().unbind();
+
+	//disable lighting, material, and z-buffer.
+	ofDisableDepthTest();
+	material.end();
+	light.disable();
+	ofDisableLighting();
 }
 
 void ofApp::stripePattern()
